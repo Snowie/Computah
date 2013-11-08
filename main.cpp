@@ -7,10 +7,14 @@ using namespace std;
 class Gate
 {
 	public:
-		virtual void update() = 0;
 		bool state;
 		int num;
 		int inputs;
+		Gate(int n)
+		{
+			num = n;
+		}
+		virtual void update() = 0;
 };
 
 class AND: public Gate
@@ -18,9 +22,8 @@ class AND: public Gate
 public:
 	bool * left;
 	bool * right;
-	AND(Gate * l, Gate * r, int n)
+	AND(Gate * l, Gate * r, int n) : Gate(n)
 	{
-		num = n;
 		inputs = 2;
 		state = false;
 		left = &(l->state);
@@ -37,9 +40,8 @@ class OR: public Gate
 public:
 	bool * left;
 	bool * right;
-	OR(Gate * l, Gate * r, int n)
+	OR(Gate * l, Gate * r, int n): Gate(n)
 	{
-		num = n;
 		inputs = 2;
 		state = false;
 		left = &(l->state);
@@ -56,9 +58,8 @@ class XOR: public Gate
 public:
 	bool * left;
 	bool * right;
-	XOR(Gate * l, Gate * r, int n)
+	XOR(Gate * l, Gate * r, int n) : Gate(n)
 	{
-		num = n;
 		inputs = 2;
 		state = false;
 		left = &(l->state);
@@ -74,9 +75,8 @@ class NOT: public Gate
 {
 public:
 	bool * input;
-	NOT(Gate * g, int n)
+	NOT(Gate * g, int n) : Gate(n)
 	{
-		num = n;
 		inputs = 1;
 		state = false;
 		input = &(g->state);
@@ -91,9 +91,8 @@ public:
 class ON: public Gate
 {
 public:
-	ON(int n)
+	ON(int n) : Gate(n)
 	{
-		num = n;
 		inputs = 0;
 		state = true;
 	}
@@ -106,9 +105,8 @@ public:
 class OFF: public Gate
 {
 public:
-	OFF(int n)
+	OFF(int n) : Gate(n)
 	{
-		num = n;
 		inputs = 0;
 		state = false;
 	}
@@ -202,7 +200,7 @@ int main()
 		for(int j = 0; j < 4; ++j)
 			matrix[i][j] = false;
 
-	ON term1(0);
+	OFF term1(0);
 	gates.push_back(&term1);
 
 	ON term2(1);
