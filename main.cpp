@@ -3,31 +3,55 @@
 #include <iostream>
 
 using namespace std;
+//bool matrix [4][4];
+vector<vector<bool>> matrix;
 
 class Gate
 {
 	public:
+		static int id;
 		bool state;
 		int num;
 		int inputs;
-		Gate(int n)
+		Gate()
 		{
-			num = n;
+			int toResize = matrix.size() + 1;
+			for(unsigned int i = 0; i < matrix.size(); ++i)
+			{
+				matrix[i].resize(toResize);
+				matrix[i].back() = false;
+			}
+			
+			matrix.resize(toResize);
+			matrix.back().resize(toResize);
+
+			for(unsigned int i = 0; i < matrix.back().size(); ++i)
+				matrix.back()[i] = false;
+
+
+
+			num = ++id;
 		}
 		virtual void update() = 0;
 };
+
+int Gate::id = -1;
+
+vector <Gate *> gates;
 
 class AND: public Gate
 {
 	public:
 		bool * left;
 		bool * right;
-		AND(Gate * l, Gate * r, int n) : Gate(n)
+		AND(Gate * l, Gate * r)
 		{
 			inputs = 2;
 			state = false;
 			left = &(l->state);
 			right = &(r->state);
+			matrix[r->num][num] = true;
+			matrix[l->num][num] = true;
 		}
 		void update()
 		{
@@ -40,12 +64,14 @@ class OR: public Gate
 	public:	
 		bool * left;
 		bool * right;
-		OR(Gate * l, Gate * r, int n): Gate(n)
+		OR(Gate * l, Gate * r)
 		{
 			inputs = 2;
 			state = false;
 			left = &(l->state);
 			right = &(r->state);
+			matrix[r->num][num] = true;
+			matrix[l->num][num] = true;
 		}
 		void update()
 		{
@@ -58,12 +84,14 @@ class XOR: public Gate
 	public:
 		bool * left;
 		bool * right;
-		XOR(Gate * l, Gate * r, int n) : Gate(n)
+		XOR(Gate * l, Gate * r)
 		{
 			inputs = 2;
 			state = false;
 			left = &(l->state);
 			right = &(r->state);
+			matrix[r->num][num] = true;
+			matrix[l->num][num] = true;
 		}
 		void update()
 		{
@@ -75,11 +103,12 @@ class NOT: public Gate
 {
 	public:
 		bool * input;
-		NOT(Gate * g, int n) : Gate(n)
+		NOT(Gate * g)
 		{
 			inputs = 1;
 			state = false;
 			input = &(g->state);
+			matrix[g->num][num] = true;
 		}
 		void update()
 		{
@@ -91,7 +120,7 @@ class NOT: public Gate
 class ON: public Gate
 {
 	public:
-		ON(int n) : Gate(n)
+		ON()
 		{
 			inputs = 0;
 			state = true;
@@ -105,7 +134,7 @@ class ON: public Gate
 class OFF: public Gate
 {
 	public:
-		OFF(int n) : Gate(n)
+		OFF()
 		{
 			inputs = 0;
 			state = false;
@@ -116,9 +145,6 @@ class OFF: public Gate
 		}
 };
 
-bool matrix [4][4];
-vector <Gate *> gates;
-
 //The following function is written by the proceeding author
 
 // Sean Szumlanski
@@ -127,9 +153,10 @@ vector <Gate *> gates;
 vector <Gate *> topoSort()
 {
 	vector <Gate *> toRet;
-	int incoming [4];
+	vector <int> incoming;
+	incoming.resize(matrix.size());
 	
-	for(int i = 0; i < 4; ++i)
+	for(unsigned int i = 0; i < incoming.size(); ++i)
 		incoming[i] = 0;
 	
 	int cnt = 0;
@@ -137,10 +164,10 @@ vector <Gate *> topoSort()
 	// Count the number of incoming edges incident to each vertex. For sparse
 	// graphs, this could be made more efficient by using an adjacency list.
 
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++)
+	for(unsigned int i = 0; i < matrix.size(); ++i)
+		for(unsigned int j = 0; j < matrix[i].size(); ++j)
 			if(matrix[i][j])
-				incoming[j]++;
+				++incoming[j];
 
 	queue <Gate *> q;
 
@@ -149,7 +176,6 @@ vector <Gate *> topoSort()
 	for (int i = 0; i < 4; i++)
 		if (incoming[i] == 0)
 			q.push(gates[i]);
-
 
 	while (!q.empty())
 	{
@@ -181,32 +207,18 @@ vector <Gate *> topoSort()
 
 int main()
 {
-	for(int i = 0; i < 4; ++i)
-		for(int j = 0; j < 4; ++j)
-			matrix[i][j] = false;
 
-	OFF term1(0);
+	OFF term1;
 	gates.push_back(&term1);
 
-	ON term2(1);
+	ON term2;
 	gates.push_back(&term2);
 
-	XOR sum (&term1, &term2, 2);
+	XOR sum (&term1, &term2);
 	gates.push_back(&sum);
 	
-	AND carry (&term1, &term2, 3);
+	AND carry (&term1, &term2);
 	gates.push_back(&carry);
-
-	//Term1 is adjacent to sum
-	matrix[0][2] = true;
-	//Term2 is adjacent to sum
-	matrix[1][2] = true;
-
-
-	//Term1 is adjacent to carry
-	matrix[0][3] = true;
-	//Term2 is adjacent to carry
-	matrix[1][3] = true;
 
 	vector<Gate *> order = topoSort();
 
