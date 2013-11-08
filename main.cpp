@@ -138,25 +138,17 @@ vector <Gate *> topoSort()
 	// graphs, this could be made more efficient by using an adjacency list.
 
 	for (int i = 0; i < 4; i++)
-	{
 		for (int j = 0; j < 4; j++)
-		{
 			if(matrix[i][j])
 				incoming[j]++;
-		}
-	}
 
 	queue <Gate *> q;
 
 	// Any vertex with zero incoming edges is ready to be visited, so add it to
 	// the queue.
 	for (int i = 0; i < 4; i++)
-	{
 		if (incoming[i] == 0)
-		{
 			q.push(gates[i]);
-		}
-	}
 
 
 	while (!q.empty())
@@ -175,21 +167,14 @@ vector <Gate *> topoSort()
 		// zero, add it to the queue, as it's ready to be included in our
 		// topological sort.
 		for (int i = 0; i < 4; i++)
-		{
 			if (matrix[node->num][i] && --incoming[i] == 0)
-			{
 				q.push(gates[i]);
-			}
-		}
 	}
 
 	// If we pass out of the loop without including each vertex in our
 	// topological sort, we must have a cycle in the graph.
 	if (cnt != 4)
-	{
-		cout << cnt << endl;
 		cout << "Error: Graph contains a cycle!" << endl;
-	}
 
 	return toRet;
 }
