@@ -19,101 +19,101 @@ class Gate
 
 class AND: public Gate
 {
-public:
-	bool * left;
-	bool * right;
-	AND(Gate * l, Gate * r, int n) : Gate(n)
-	{
-		inputs = 2;
-		state = false;
-		left = &(l->state);
-		right = &(r->state);
-	}
-	void update()
-	{
-		state = (*left) & (*right);
-	}
+	public:
+		bool * left;
+		bool * right;
+		AND(Gate * l, Gate * r, int n) : Gate(n)
+		{
+			inputs = 2;
+			state = false;
+			left = &(l->state);
+			right = &(r->state);
+		}
+		void update()
+		{
+			state = (*left) & (*right);
+		}
 };
 
 class OR: public Gate
 {
-public:
-	bool * left;
-	bool * right;
-	OR(Gate * l, Gate * r, int n): Gate(n)
-	{
-		inputs = 2;
-		state = false;
-		left = &(l->state);
-		right = &(r->state);
-	}
-	void update()
-	{
-		state = (*left) | (*right);
-	}
+	public:	
+		bool * left;
+		bool * right;
+		OR(Gate * l, Gate * r, int n): Gate(n)
+		{
+			inputs = 2;
+			state = false;
+			left = &(l->state);
+			right = &(r->state);
+		}
+		void update()
+		{
+			state = (*left) | (*right);
+		}
 };
 
 class XOR: public Gate
 {
-public:
-	bool * left;
-	bool * right;
-	XOR(Gate * l, Gate * r, int n) : Gate(n)
-	{
-		inputs = 2;
-		state = false;
-		left = &(l->state);
-		right = &(r->state);
-	}
-	void update()
-	{
-		state = (*left) ^ (*right);
-	}
+	public:
+		bool * left;
+		bool * right;
+		XOR(Gate * l, Gate * r, int n) : Gate(n)
+		{
+			inputs = 2;
+			state = false;
+			left = &(l->state);
+			right = &(r->state);
+		}
+		void update()
+		{
+			state = (*left) ^ (*right);
+		}
 };
 
 class NOT: public Gate
 {
-public:
-	bool * input;
-	NOT(Gate * g, int n) : Gate(n)
-	{
-		inputs = 1;
-		state = false;
-		input = &(g->state);
-	}
-	void update()
-	{
-		state = !(*input);
-	}
+	public:
+		bool * input;
+		NOT(Gate * g, int n) : Gate(n)
+		{
+			inputs = 1;
+			state = false;
+			input = &(g->state);
+		}
+		void update()
+		{
+			state = !(*input);
+		}
 };
 
 //I choose to make values gates because it makes my life more sane.
 class ON: public Gate
 {
-public:
-	ON(int n) : Gate(n)
-	{
-		inputs = 0;
-		state = true;
-	}
-	void update()
-	{
-		;
-	}
+	public:
+		ON(int n) : Gate(n)
+		{
+			inputs = 0;
+			state = true;
+		}
+		void update()
+		{
+			;
+		}
 };
 
 class OFF: public Gate
 {
-public:
-	OFF(int n) : Gate(n)
-	{
-		inputs = 0;
-		state = false;
-	}
-	void update()
-	{
-		;
-	}
+	public:
+		OFF(int n) : Gate(n)
+		{
+			inputs = 0;
+			state = false;
+		}
+		void update()
+		{
+			;
+		}
 };
 
 bool matrix [4][4];
