@@ -3,8 +3,10 @@
 #include <iostream>
 
 using namespace std;
-//bool matrix [4][4];
+class Gate;
+
 vector<vector<bool>> matrix;
+vector<Gate *> gates;
 
 class Gate
 {
@@ -28,16 +30,14 @@ class Gate
 			for(unsigned int i = 0; i < matrix.back().size(); ++i)
 				matrix.back()[i] = false;
 
-
-
 			num = ++id;
+
+			gates.push_back(this);
 		}
 		virtual void update() = 0;
 };
 
 int Gate::id = -1;
-
-vector <Gate *> gates;
 
 class AND: public Gate
 {
@@ -205,20 +205,25 @@ vector <Gate *> topoSort()
 	return toRet;
 }
 
+void init()
+{
+	//Read in each line of input
+
+	//Initialize each gate per line
+
+	//Example input line:
+	//AND and3 : on1 on2
+}
+
 int main()
 {
-
-	OFF term1;
-	gates.push_back(&term1);
+	ON term1;
 
 	ON term2;
-	gates.push_back(&term2);
 
 	XOR sum (&term1, &term2);
-	gates.push_back(&sum);
 	
 	AND carry (&term1, &term2);
-	gates.push_back(&carry);
 
 	vector<Gate *> order = topoSort();
 
