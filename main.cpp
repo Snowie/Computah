@@ -1,63 +1,8 @@
 #include <vector>
 #include <queue>
 #include <iostream>
-
-using namespace std;
-class Gate;
-
-vector<vector<bool>> matrix;
-vector<Gate *> gates;
-
-class Gate
-{
-	public:
-		static int id;
-		bool state;
-		int num;
-		int inputs;
-		Gate()
-		{
-			int toResize = matrix.size() + 1;
-			for(unsigned int i = 0; i < matrix.size(); ++i)
-			{
-				matrix[i].resize(toResize);
-				matrix[i].back() = false;
-			}
-			
-			matrix.resize(toResize);
-			matrix.back().resize(toResize);
-
-			for(unsigned int i = 0; i < matrix.back().size(); ++i)
-				matrix.back()[i] = false;
-
-			num = ++id;
-
-			gates.push_back(this);
-		}
-		virtual void update() = 0;
-};
-
-int Gate::id = -1;
-
-class AND: public Gate
-{
-	public:
-		bool * left;
-		bool * right;
-		AND(Gate * l, Gate * r)
-		{
-			inputs = 2;
-			state = false;
-			left = &(l->state);
-			right = &(r->state);
-			matrix[r->num][num] = true;
-			matrix[l->num][num] = true;
-		}
-		void update()
-		{
-			state = (*left) & (*right);
-		}
-};
+#include "headers/gate.h"
+#include "headers/and.h"
 
 class OR: public Gate
 {
@@ -173,7 +118,7 @@ vector <Gate *> topoSort()
 
 	// Any vertex with zero incoming edges is ready to be visited, so add it to
 	// the queue.
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < matrix.size(); i++)
 		if (incoming[i] == 0)
 			q.push(gates[i]);
 
@@ -192,14 +137,14 @@ vector <Gate *> topoSort()
 		// have their incoming edge counts decremented. If one of these hits
 		// zero, add it to the queue, as it's ready to be included in our
 		// topological sort.
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < matrix.size(); i++)
 			if (matrix[node->num][i] && --incoming[i] == 0)
 				q.push(gates[i]);
 	}
 
 	// If we pass out of the loop without including each vertex in our
 	// topological sort, we must have a cycle in the graph.
-	if (cnt != 4)
+	if (cnt != matrix.size())
 		cout << "Error: Graph contains a cycle!" << endl;
 
 	return toRet;
