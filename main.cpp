@@ -1,99 +1,18 @@
 #include <vector>
 #include <queue>
 #include <iostream>
-#include "headers/gate.h"
-#include "headers/and.h"
 
-class OR: public Gate
-{
-	public:	
-		bool * left;
-		bool * right;
-		OR(Gate * l, Gate * r)
-		{
-			inputs = 2;
-			state = false;
-			left = &(l->state);
-			right = &(r->state);
-			matrix[r->num][num] = true;
-			matrix[l->num][num] = true;
-		}
-		void update()
-		{
-			state = (*left) | (*right);
-		}
-};
+#include "headers/gates.h"
 
-class XOR: public Gate
-{
-	public:
-		bool * left;
-		bool * right;
-		XOR(Gate * l, Gate * r)
-		{
-			inputs = 2;
-			state = false;
-			left = &(l->state);
-			right = &(r->state);
-			matrix[r->num][num] = true;
-			matrix[l->num][num] = true;
-		}
-		void update()
-		{
-			state = (*left) ^ (*right);
-		}
-};
-
-class NOT: public Gate
-{
-	public:
-		bool * input;
-		NOT(Gate * g)
-		{
-			inputs = 1;
-			state = false;
-			input = &(g->state);
-			matrix[g->num][num] = true;
-		}
-		void update()
-		{
-			state = !(*input);
-		}
-};
-
-//I choose to make values gates because it makes my life more sane.
-class ON: public Gate
-{
-	public:
-		ON()
-		{
-			inputs = 0;
-			state = true;
-		}
-		void update()
-		{
-			;
-		}
-};
-
-class OFF: public Gate
-{
-	public:
-		OFF()
-		{
-			inputs = 0;
-			state = false;
-		}
-		void update()
-		{
-			;
-		}
-};
-
-//The following function is written by the proceeding author
+/*The following function is a modification of a function written by the
+ *proceeding author.*/
 
 // Sean Szumlanski
 // COP 3503, Fall 2013
+
+/*The modifications changed the nodes to be of type gate rather than int,
+ *dynamically sized arrays, switching to C++ from Java, and returning a sorted
+ *vector rather than printing the order.*/
 
 vector <Gate *> topoSort()
 {
