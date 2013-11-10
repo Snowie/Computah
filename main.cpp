@@ -75,7 +75,6 @@ class TQ : public Gate
 		}
 		void update()
 		{
-			//if(*clk)
 			if(safety)
 			{
 				if(!seenClock)
@@ -161,9 +160,17 @@ void init()
 int main()
 {
 	ON on1;
-	Clock clk(.5);
+	Clock clk(3);
 	TQ tq1(&on1, &clk);
 	TQ tq2(&tq1, &clk);
+
+	AND and1(&tq1, &tq2);
+	
+	TQ tq3(&and1, &clk);
+	
+	AND and2(&tq3, &and1);
+	
+	TQ tq4(&and2, &clk);
 
 	/*ON term1;
 
@@ -182,14 +189,12 @@ int main()
 
 	clk.start();
 
-	bool tq1State = tq1.state;
-	bool tq2State = tq2.state;
-
-	int num = 0;
+	int num = -1;
 
 	while(true)
 	{
-		int newNum = int(tq1.state) + int(tq2.state)*2;
+		int newNum = int(tq1.state) + int(tq2.state)*2 + int(tq3.state)*4 + int(tq4.state)*8;
+		
 		if(newNum != num)
 		{
 			cout << "Num changed to: " << newNum << endl;
@@ -200,6 +205,8 @@ int main()
 
 		tq1.safety = safetyDance;
 		tq2.safety = safetyDance;
+		tq3.safety = safetyDance;
+		tq4.safety = safetyDance;
 
 		for(Gate * g: order)
 			g->update();
