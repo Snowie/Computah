@@ -1,6 +1,8 @@
 #include <vector>
 #include <queue>
 #include <iostream>
+#include <chrono>
+#include <thread>
 
 #include "headers/gates.h"
 
@@ -13,6 +15,83 @@
 /*The modifications changed the nodes to be of type gate rather than int,
  *dynamically sized arrays, switching to C++ from Java, and returning a sorted
  *vector rather than printing the order.*/
+
+class Clock : public Gate
+{
+	public:
+		bool threadingSafety;
+		Clock(float hertz)
+		{
+			frequency = hertz;
+			state = false;
+			threadingSafety = state;
+		}
+
+		void update()
+		{
+			;
+		}
+
+		void start()
+		{
+			std::thread t(&Clock::cycle, this);
+			t.detach();
+		}
+	private:
+		void cycle()
+		{
+			int arg = int(1000.0/frequency);
+			std::chrono::milliseconds dura( arg );
+			while(true)
+			{
+				std::this_thread::sleep_for( dura );
+				state = !state;
+				threadingSafety = state;
+			}
+		}
+
+		float frequency;
+
+};
+
+class TQ : public Gate
+{
+	public:
+		bool * in;
+		bool * clk;
+		bool safety;
+		bool stateNext;
+		bool seenClock;
+		TQ(Gate * in, Clock * clk)
+		{
+			safety = false;
+			this->in = &(in->state);
+			this->clk = &(clk->state);
+			matrix[in->num][num] = true;
+			matrix[clk->num][num] = true;
+			state = false;
+			stateNext = false;
+			seenClock = false;
+		}
+		void update()
+		{
+			//if(*clk)
+			if(safety)
+			{
+				if(!seenClock)
+				{
+					state = stateNext;
+					stateNext = state ^ (*in);
+					seenClock = true;
+				}
+			}
+			else
+			{
+				seenClock = false;
+			}
+		}
+
+};
 
 vector <Gate *> topoSort()
 {
@@ -81,22 +160,50 @@ void init()
 
 int main()
 {
-	ON term1;
+	ON on1;
+	Clock clk(.5);
+	TQ tq1(&on1, &clk);
+	TQ tq2(&tq1, &clk);
+
+	/*ON term1;
 
 	ON term2;
 
 	XOR sum (&term1, &term2);
 	
-	AND carry (&term1, &term2);
+	AND carry (&term1, &term2);*/
 
 	vector<Gate *> order = topoSort();
-
-	for(Gate * g: order)
-		g->update();
 	
-	cout << "Term1 is: " << term1.state << endl;
+	/*cout << "Term1 is: " << term1.state << endl;
 	cout << "Term2 is: " << term2.state << endl;
 	cout << "Sum is: " << sum.state << endl;
-	cout << "Carry is: " << carry.state << endl;
+	cout << "Carry is: " << carry.state << endl;*/
 
+	clk.start();
+
+	bool tq1State = tq1.state;
+	bool tq2State = tq2.state;
+
+	int num = 0;
+
+	while(true)
+	{
+		int newNum = int(tq1.state) + int(tq2.state)*2;
+		if(newNum != num)
+		{
+			cout << "Num changed to: " << newNum << endl;
+			num = newNum;
+		}
+
+		bool safetyDance = clk.threadingSafety;
+
+		tq1.safety = safetyDance;
+		tq2.safety = safetyDance;
+
+		for(Gate * g: order)
+			g->update();
+	}
+
+	return 0;
 }
