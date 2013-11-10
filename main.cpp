@@ -160,7 +160,11 @@ void init()
 int main()
 {
 	ON on1;
-	Clock clk(3);
+	Clock clk(15);
+	
+	//TQ_{n} = TQ_{n-1} & TQ_{n-2}
+	//In the case of TQ_1, the input is simply true.
+
 	TQ tq1(&on1, &clk);
 	TQ tq2(&tq1, &clk);
 
@@ -172,20 +176,23 @@ int main()
 	
 	TQ tq4(&and2, &clk);
 
-	/*ON term1;
+	AND and3(&tq4, &and2);
 
-	ON term2;
+	TQ tq5(&and3, &clk);
 
-	XOR sum (&term1, &term2);
-	
-	AND carry (&term1, &term2);*/
+	AND and4(&tq5, &and3);
+
+	TQ tq6(&and4, &clk);
+
+	AND and5(&tq6, &and4);
+
+	TQ tq7(&and5, &clk);
+
+	AND and6(&tq7, &and5);
+
+	TQ tq8(&and6, &clk);
 
 	vector<Gate *> order = topoSort();
-	
-	/*cout << "Term1 is: " << term1.state << endl;
-	cout << "Term2 is: " << term2.state << endl;
-	cout << "Sum is: " << sum.state << endl;
-	cout << "Carry is: " << carry.state << endl;*/
 
 	clk.start();
 
@@ -193,7 +200,9 @@ int main()
 
 	while(true)
 	{
-		int newNum = int(tq1.state) + int(tq2.state)*2 + int(tq3.state)*4 + int(tq4.state)*8;
+		int newNum = int(tq1.state) + int(tq2.state) * 2 + int(tq3.state) * 4 + 
+		int(tq4.state) * 8 + int(tq5.state) * 16 + int(tq6.state) * 32 + 
+		int(tq7.state) * 64 + int(tq8.state) * 128;
 		
 		if(newNum != num)
 		{
@@ -207,6 +216,10 @@ int main()
 		tq2.safety = safetyDance;
 		tq3.safety = safetyDance;
 		tq4.safety = safetyDance;
+		tq5.safety = safetyDance;
+		tq6.safety = safetyDance;
+		tq7.safety = safetyDance;
+		tq8.safety = safetyDance;
 
 		for(Gate * g: order)
 			g->update();
