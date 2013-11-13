@@ -6,16 +6,6 @@
 
 #include "headers/gates.h"
 
-/*The following function is a modification of a function written by the
- *proceeding author.*/
-
-// Sean Szumlanski
-// COP 3503, Fall 2013
-
-/*The modifications changed the nodes to be of type gate rather than int,
- *dynamically sized arrays, switching to C++ from Java, and returning a sorted
- *vector rather than printing the order.*/
-
 class Clock : public Gate
 {
 	public:
@@ -91,6 +81,16 @@ class TQ : public Gate
 		}
 
 };
+
+/*The following function is a modification of a function written by the
+ *proceeding author.*/
+
+// Sean Szumlanski
+// COP 3503, Fall 2013
+
+/*The modifications changed the nodes to be of type gate rather than int,
+ *dynamically sized arrays, switching to C++ from Java, and returning a sorted
+ *vector rather than printing the order.*/
 
 vector <Gate *> topoSort()
 {
